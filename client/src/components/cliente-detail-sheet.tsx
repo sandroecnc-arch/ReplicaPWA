@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -71,6 +72,8 @@ export function ClienteDetailSheet({ cliente, open, onOpenChange }: ClienteDetai
       telefone: cliente.telefone,
       email: cliente.email || "",
       instagram: cliente.instagram || "",
+      alergias: cliente.alergias || "",
+      preferencias: cliente.preferencias || "",
     },
   });
 
@@ -275,6 +278,18 @@ export function ClienteDetailSheet({ cliente, open, onOpenChange }: ClienteDetai
                         {cliente.instagram || "Não informado"}
                       </p>
                     </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Alergias</label>
+                      <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">
+                        {cliente.alergias || "Nenhuma alergia registrada"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Preferências</label>
+                      <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">
+                        {cliente.preferencias || "Nenhuma preferência registrada"}
+                      </p>
+                    </div>
 
                     <div className="flex gap-2 pt-4">
                       <Button
@@ -344,6 +359,44 @@ export function ClienteDetailSheet({ cliente, open, onOpenChange }: ClienteDetai
                                   data-testid="input-instagram-edit"
                                 />
                               </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="alergias"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Alergias (opcional)</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Ex: Alergia a acetona, látex, etc."
+                                {...field}
+                                rows={3}
+                                data-testid="input-alergias-edit"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="preferencias"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Preferências (opcional)</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Ex: Prefere cores claras, gosta de alongamento, etc."
+                                {...field}
+                                rows={3}
+                                data-testid="input-preferencias-edit"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
