@@ -1,0 +1,93 @@
+Objetivo: Implementar um sistema completo de autenticação e autorização no PWA "Manicure Studio Lite", utilizando JWT (JSON Web Tokens). Cada usuário (manicure) deve ter sua própria conta e só poderá ver e gerenciar seus próprios dados (agendamentos, clientes, etc.).
+
+1. Requisitos do Backend (Node.js / Express / SQLite):
+
+Atualize o Banco de Dados:
+
+Adicione uma nova tabela usuarios no db.sqlite com as colunas: id (TEXT PRIMARY KEY), email (TEXT UNIQUE NOT NULL), password_hash (TEXT NOT NULL).
+
+Adicione uma coluna userId (TEXT) em todas as outras tabelas (agendamentos, clientes, servicos, produtos, historico) para associar cada registro a um usuário.
+
+Adicione Dependências:
+
+Instale as bibliotecas bcryptjs e jsonwebtoken: npm install bcryptjs jsonwebtoken.
+
+Crie as Rotas de Autenticação:
+
+POST /api/usuarios/register:
+
+Recebe email and password.
+
+Verifica se o e-mail já existe.
+
+Criptografa a senha usando bcryptjs.
+
+Salva o novo usuário no banco de dados.
+
+POST /api/usuarios/login:
+
+Recebe email and password.
+
+Busca o usuário pelo e-mail.
+
+Compara a senha recebida com a password_hash usando bcryptjs.compare.
+
+Se a senha for válida, gera um JWT Token (com jsonwebtoken) contendo o userId e o envia na resposta.
+
+Crie um Middleware de Proteção (authMiddleware.js):
+
+Este middleware deve extrair o JWT Token do cabeçalho Authorization: Bearer <token>.
+
+Deve verificar a validade do token usando jsonwebtoken.verify.
+
+Se for válido, deve decodificar o userId e anexá-lo ao objeto req (ex: req.user = { id: userId }).
+
+Se for inválido, deve retornar um erro 401 Unauthorized ou 403 Forbidden.
+
+Proteja as Rotas da API e Filtre os Dados:
+
+Aplique o authMiddleware a todas as rotas de dados (/api/agendamentos, /api/clientes, etc.), exceto as de login e registro.
+
+Modifique todos os endpoints de CRUD:
+
+GET: Adicione uma cláusula WHERE userId = ? em todas as buscas para retornar apenas os dados do usuário logado (req.user.id).
+
+POST: Ao criar um novo registro, inclua o userId (req.user.id).
+
+PATCH/DELETE: Antes de atualizar ou deletar, verifique se o registro pertence ao usuário logado.
+
+2. Requisitos do Frontend (React):
+
+Crie um Contexto de Autenticação (AuthContext.js):
+
+Deve gerenciar o estado global: isAuthenticated, user, e token.
+
+Deve ter funções para login, logout e register.
+
+Ao fazer login, o token JWT deve ser salvo no localStorage.
+
+Ao carregar o app, ele deve verificar se há um token no localStorage para manter o usuário logado.
+
+Crie as Páginas de Autenticação:
+
+LoginPage.jsx: Formulário com campos de e-mail e senha que chama a função login do AuthContext.
+
+RegisterPage.jsx: Formulário para cadastro de novos usuários.
+
+Implemente Rotas Protegidas:
+
+Crie um componente <ProtectedRoute /> que verifica se isAuthenticated é verdadeiro.
+
+Se for falso, redireciona o usuário para a página de login.
+
+Envolva todas as páginas principais do aplicativo (Agenda, Clientes, etc.) com este componente.
+
+Atualize as Chamadas de API:
+
+Modifique sua lógica de fetch para incluir o token JWT em todas as requisições para rotas protegidas. O cabeçalho deve ser:Authorization: 'Bearer ' + token
+
+Adicione um Botão de Logout:
+
+No cabeçalho ou na página de configurações, adicione um botão que chama a função logout do AuthContext, que deve limpar o token do localStorage e redirecionar para a página de login.
+
+Resultado Final: O PWA deve iniciar em uma página de login. Após o login,
