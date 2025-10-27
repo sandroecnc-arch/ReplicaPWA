@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Search, Plus, AlertTriangle, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, AlertTriangle, Edit, Trash2, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,37 @@ export default function Produtos() {
       });
     },
   });
+
+  const adjustStockMutation = useMutation({
+    mutationFn: ({ id, newQty }: { id: number; newQty: number }) => {
+      const produto = produtos?.find(p => p.id === id);
+      if (!produto) throw new Error("Produto não encontrado");
+      
+      return apiRequest("PATCH", `/api/produtos/${id}`, {
+        nome: produto.nome,
+        marca: produto.marca,
+        categoria: produto.categoria,
+        colorHex: produto.colorHex,
+        qty: newQty,
+        minQty: produto.minQty,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/produtos"] });
+    },
+    onError: () => {
+      toast({
+        title: "Erro ao ajustar estoque",
+        description: "Ocorreu um erro ao ajustar o estoque. Tente novamente.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const adjustStock = (produto: Produto, delta: number) => {
+    const newQty = Math.max(0, produto.qty + delta);
+    adjustStockMutation.mutate({ id: produto.id, newQty });
+  };
 
   const categorias = Array.from(new Set(produtos?.map((p) => p.categoria) || []));
 
@@ -204,9 +235,37 @@ export default function Produtos() {
                     <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
                       <div className="flex justify-between items-center">
                         <span className="text-xs sm:text-sm text-muted-foreground">Estoque atual:</span>
-                        <span className={`text-xs sm:text-sm font-semibold ${needsRestock ? 'text-destructive' : 'text-foreground'}`} data-testid={`text-qty-${produto.id}`}>
-                          {produto.qty}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-7 w-7"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              adjustStock(produto, -1);
+                            }}
+                            disabled={produto.qty === 0 || adjustStockMutation.isPending}
+                            data-testid={`button-decrease-${produto.id}`}
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className={`text-xs sm:text-sm font-semibold min-w-[2rem] text-center ${needsRestock ? 'text-destructive' : 'text-foreground'}`} data-testid={`text-qty-${produto.id}`}>
+                            {produto.qty}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-7 w-7"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              adjustStock(produto, 1);
+                            }}
+                            disabled={adjustStockMutation.isPending}
+                            data-testid={`button-increase-${produto.id}`}
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-xs sm:text-sm text-muted-foreground">Estoque mínimo:</span>
