@@ -193,15 +193,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const data = insertProdutoSchema.parse(req.body);
       const result = db.prepare(`
-        INSERT INTO produtos (nome, descricao, preco, estoque)
-        VALUES (?, ?, ?, ?)
-      `).run(data.nome, data.descricao || null, data.preco, data.estoque);
+        INSERT INTO produtos (nome, marca, categoria, colorHex, qty, minQty)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(data.nome, data.marca || null, data.categoria, data.colorHex || null, data.qty, data.minQty);
 
       const produto = db.prepare("SELECT * FROM produtos WHERE id = ?").get(result.lastInsertRowid) as Produto;
       res.status(201).json(produto);
     } catch (error: any) {
       console.error("Error creating produto:", error);
       res.status(400).json({ error: error.message || "Failed to create produto" });
+    }
+  });
+
+  // PATCH /api/produtos/:id - Update product
+  app.patch("/api/produtos/:id", (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertProdutoSchema.partial().parse(req.body);
+      
+      const fields: string[] = [];
+      const values: any[] = [];
+      
+      if (data.nome !== undefined) {
+        fields.push("nome = ?");
+        values.push(data.nome);
+      }
+      if (data.marca !== undefined) {
+        fields.push("marca = ?");
+        values.push(data.marca || null);
+      }
+      if (data.categoria !== undefined) {
+        fields.push("categoria = ?");
+        values.push(data.categoria);
+      }
+      if (data.colorHex !== undefined) {
+        fields.push("colorHex = ?");
+        values.push(data.colorHex || null);
+      }
+      if (data.qty !== undefined) {
+        fields.push("qty = ?");
+        values.push(data.qty);
+      }
+      if (data.minQty !== undefined) {
+        fields.push("minQty = ?");
+        values.push(data.minQty);
+      }
+      
+      if (fields.length === 0) {
+        return res.status(400).json({ error: "No fields to update" });
+      }
+      
+      values.push(id);
+      
+      db.prepare(`UPDATE produtos SET ${fields.join(", ")} WHERE id = ?`).run(...values);
+      
+      const produto = db.prepare("SELECT * FROM produtos WHERE id = ?").get(id) as Produto;
+      if (!produto) {
+        return res.status(404).json({ error: "Produto not found" });
+      }
+      
+      res.json(produto);
+    } catch (error: any) {
+      console.error("Error updating produto:", error);
+      res.status(400).json({ error: error.message || "Failed to update produto" });
+    }
+  });
+
+  // DELETE /api/produtos/:id - Delete product
+  app.delete("/api/produtos/:id", (req, res) => {
+    try {
+      const { id } = req.params;
+      db.prepare("DELETE FROM produtos WHERE id = ?").run(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting produto:", error);
+      res.status(500).json({ error: "Failed to delete produto" });
     }
   });
 

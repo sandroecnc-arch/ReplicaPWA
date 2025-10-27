@@ -8,6 +8,7 @@ import { BottomNavigation } from "@/components/bottom-navigation";
 
 import Agenda from "@/pages/agenda";
 import Clientes from "@/pages/clientes";
+import Produtos from "@/pages/produtos";
 import Relatorios from "@/pages/relatorios";
 import Configuracoes from "@/pages/configuracoes";
 import NotFound from "@/pages/not-found";
@@ -19,6 +20,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Agenda} />
           <Route path="/clientes" component={Clientes} />
+          <Route path="/produtos" component={Produtos} />
           <Route path="/relatorios" component={Relatorios} />
           <Route path="/configuracoes" component={Configuracoes} />
           <Route component={NotFound} />

@@ -32,12 +32,17 @@ export type InsertServico = z.infer<typeof insertServicoSchema>;
 export const produtoSchema = z.object({
   id: z.number(),
   nome: z.string(),
-  descricao: z.string().optional(),
-  preco: z.number(),
-  estoque: z.number(),
+  marca: z.string().optional(),
+  categoria: z.string(),
+  colorHex: z.string().optional(),
+  qty: z.number(),
+  minQty: z.number(),
 });
 
-export const insertProdutoSchema = produtoSchema.omit({ id: true });
+export const insertProdutoSchema = produtoSchema.omit({ id: true }).extend({
+  qty: z.number().min(0).default(0),
+  minQty: z.number().min(0).default(0),
+});
 
 export type Produto = z.infer<typeof produtoSchema>;
 export type InsertProduto = z.infer<typeof insertProdutoSchema>;
