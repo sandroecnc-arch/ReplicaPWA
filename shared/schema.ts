@@ -13,6 +13,8 @@ export const clienteSchema = z.object({
 export const insertClienteSchema = clienteSchema.omit({ id: true, pontos: true }).extend({
   nome: z.string().trim().min(1, "Nome é obrigatório"),
   telefone: z.string().trim().min(1, "Telefone é obrigatório"),
+  email: z.string().email().optional().or(z.literal("")).transform(val => val === "" ? undefined : val),
+  instagram: z.string().optional().transform(val => val === "" ? undefined : val),
 });
 
 export type Cliente = z.infer<typeof clienteSchema>;
