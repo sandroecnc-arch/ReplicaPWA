@@ -127,10 +127,21 @@ Cole o seguinte conteúdo (ajuste conforme necessário):
 NODE_ENV=production
 PORT=5000
 
-# OneSignal (Opcional - deixe vazio se não for usar)
-ONESIGNAL_APP_ID=
-ONESIGNAL_API_KEY=
+# OneSignal Backend (Opcional - Para enviar notificações do servidor)
+ONESIGNAL_APP_ID=seu-onesignal-app-id
+ONESIGNAL_API_KEY=sua-onesignal-api-key
+
+# OneSignal Frontend (Opcional - Para botão de ativar notificações)
+# Use o mesmo App ID do backend
+VITE_ONESIGNAL_APP_ID=seu-onesignal-app-id
 ```
+
+**Importante sobre OneSignal:**
+- Se você NÃO quiser usar notificações push, pode deixar todos os campos vazios
+- Se você QUISER usar notificações:
+  - Configure `ONESIGNAL_APP_ID` e `ONESIGNAL_API_KEY` (para o backend)
+  - Configure `VITE_ONESIGNAL_APP_ID` com o mesmo App ID (para o botão de notificações no app)
+  - Veja a seção "Configurar OneSignal" abaixo para obter essas credenciais
 
 Salve com `Ctrl+O`, Enter, e saia com `Ctrl+X`.
 
