@@ -1,0 +1,96 @@
+Prompt Final e Completo para a IA: Recriar o PWA para Servidor VPS (com Melhorias)
+Objetivo: Criar um Progressive Web App (PWA) completo chamado "Manicure Studio Lite" a partir do zero. A arquitetura deve ser robusta, utilizando um backend Node.js com Express.js e um frontend em React (Vite). O projeto final deve ser otimizado para ser implantado de forma profissional em um servidor VPS (KVM) da Hostinger.
+
+1. Tecnologias Principais:
+
+Backend: Node.js com Express.js.
+
+Frontend: React com Vite (JavaScript).
+
+Banco de Dados: SQLite (usando a biblioteca sqlite3). Os dados devem ser persistidos em um único arquivo db.sqlite.
+
+Notificações Push: OneSignal (integrado no backend).
+
+Gerenciador de Processos: PM2.
+
+Servidor Web/Proxy Reverso: Nginx.
+
+2. Estrutura do Projeto:
+
+/
+├── client/          (Código-fonte do React)
+├── server/          (Código-fonte do Express.js)
+└── shared/          (Schemas e tipos compartilhados com Zod)
+3. Requisitos do Backend (Node.js / Express):
+
+API RESTful Completa: Crie endpoints para todas as operações de CRUD (GET, POST, PATCH, DELETE) para os recursos: agendamentos, clientes, servicos, produtos.
+
+Crie um endpoint específico para o histórico do cliente: GET /api/clientes/:id/agendamentos.
+
+Persistência com SQLite:
+
+Na inicialização do servidor, crie e configure um banco de dados db.sqlite.
+
+Crie as tabelas: clientes (com uma coluna pontos do tipo INTEGER), agendamentos, servicos, produtos.
+
+Todas as rotas da API devem ler e escrever no banco de dados SQLite.
+
+Lógica de Negócio e Notificações (OneSignal):
+
+Sistema de Fidelidade: Quando um agendamento for atualizado com o status "done" (PATCH /api/agendamentos/:id), o servidor deve automaticamente adicionar pontos (ex: 10 pontos) ao cliente correspondente no banco de dados.
+
+Lembretes de Agendamento: Ao criar/editar um agendamento, o servidor deve usar a API do OneSignal para adicionar uma "Data Tag" no formato appointment_{id} com o valor da data/hora do agendamento. Ao excluir/concluir um agendamento, essa tag deve ser removida.
+
+Lembretes para Clientes Inativos: O servidor deve ter uma rotina (usando node-cron rodando a cada 24 horas) que:
+
+Verifica no banco de dados quais clientes não têm agendamentos concluídos nos últimos 30 dias.
+
+Para cada cliente inativo encontrado, envia uma notificação de reengajamento via OneSignal.
+
+Servidor de Arquivos Estáticos: O Express deve servir os arquivos estáticos do frontend da pasta dist/public e ter uma rota "catch-all" para servir o index.html.
+
+4. Requisitos do Frontend (React):
+
+Implementar todas as funcionalidades visuais das imagens fornecidas e as seguintes melhorias:
+
+Aba "Agenda": Gestão completa de agendamentos.
+
+Aba "Clientes":
+
+Permitir cadastro, busca e edição de clientes.
+
+Ao clicar em "Ver Ficha", abrir uma tela de detalhes que exibe:
+
+(MELHORIA) Um histórico completo de agendamentos para aquele cliente.
+
+(MELHORIA) O status do sistema de fidelidade, mostrando os pontos acumulados.
+
+Aba "Relatórios":
+
+(MELHORIA) Criar uma seção completa de estatísticas com gráficos sobre faturamento, serviços mais populares, status dos agendamentos, etc.
+
+Aba "Configurações":
+
+(MELHORIA) Permitir a personalização de temas visuais (claro/escuro), salvando a preferência no localStorage.
+
+Todas as interações de dados devem fazer chamadas fetch para a API do backend Node.js.
+
+5. Processo de Build:
+
+O comando npm run build deve compilar tanto o frontend quanto o backend e colocar o resultado final na pasta dist/.
+
+6. Documentação (README.md):
+
+O README.md é crucial. Ele deve conter um guia de deploy completo e passo a passo para um servidor VPS (Ubuntu/Debian), incluindo:
+
+Preparação do Servidor: Comandos para instalar nodejs, npm, nginx e pm2.
+
+Deploy da Aplicação: Comandos para clonar, instalar dependências (npm install) e construir o projeto (npm run build).
+
+Configuração do Nginx: Um exemplo de configuração de proxy reverso para direcionar o tráfego da porta 80 para a aplicação Node.js.
+
+Iniciar com PM2: Comandos para iniciar a aplicação (pm2 start dist/index.js), salvar a configuração (pm2 save) e garantir que ela reinicie com o servidor (pm2 startup).
+
+Configuração do OneSignal: Instruções claras sobre como criar a conta, obter o App ID e configurar as automações para os lembretes de 24h, 3h e 1h no painel do OneSignal.
+
+Resultado Final: Ao final, me forneça um link para baixar o projeto completo como um arquivo ZIP, contendo todo o código-fonte e o README.md atualizado com as instruções detalhadas para o deploy no VPS.
