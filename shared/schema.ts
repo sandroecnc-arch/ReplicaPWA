@@ -23,7 +23,11 @@ export const servicoSchema = z.object({
   duracao: z.number(), // em minutos
 });
 
-export const insertServicoSchema = servicoSchema.omit({ id: true });
+export const insertServicoSchema = servicoSchema.omit({ id: true }).extend({
+  nome: z.string().trim().min(1, "Nome é obrigatório"),
+  duracao: z.number().min(1, "Duração deve ser pelo menos 1 minuto"),
+  preco: z.number().min(0, "Preço não pode ser negativo"),
+});
 
 export type Servico = z.infer<typeof servicoSchema>;
 export type InsertServico = z.infer<typeof insertServicoSchema>;

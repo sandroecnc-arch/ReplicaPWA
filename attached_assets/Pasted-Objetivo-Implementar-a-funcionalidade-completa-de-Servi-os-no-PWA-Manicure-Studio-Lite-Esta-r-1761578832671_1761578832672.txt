@@ -1,0 +1,73 @@
+Objetivo: Implementar a funcionalidade completa de "Serviços" no PWA "Manicure Studio Lite". Esta área permitirá à usuária cadastrar, editar e excluir os serviços oferecidos no seu estúdio, como "Manicure", "Pedicure", etc.
+
+1. Interface do Usuário (Frontend - React):
+
+Página Principal da Aba "Serviços":
+
+No cabeçalho da página, deve haver um botão de "+" para abrir o formulário de "Novo Serviço".
+
+A página deve listar todos os serviços cadastrados em cards individuais.
+
+Card de Serviço:
+
+Informações: Cada card deve exibir claramente:
+
+Nome do Serviço (ex: "Manicure Completa").
+
+Duração (ex: "60 min"), acompanhado de um ícone de relógio.
+
+Preço (ex: "R$ 50,00"), acompanhado de um ícone de cifrão.
+
+Ações: Em cada card, deve haver dois botões:
+
+Editar: Um ícone de caneta que abre o formulário de edição com os dados do serviço preenchidos.
+
+Excluir: Um ícone de lixeira que solicita uma confirmação antes de remover o serviço.
+
+Formulário de Adicionar/Editar Serviço (em um modal):
+
+O formulário deve conter os seguintes campos:
+
+Nome do Serviço: (Texto, obrigatório) - Ex: "Manicure"
+
+Duração (em minutos): (Número, obrigatório, min="1") - Ex: "60"
+
+Preço (R$): (Número, obrigatório, min="0", step="0.01") - Ex: "50.00"
+
+Deve ter os botões "Salvar" e "Cancelar". Ao salvar, a API correspondente deve ser chamada e a lista de serviços, atualizada.
+
+2. Lógica do Backend (Node.js / Express / SQLite):
+
+Tabela no Banco de Dados (db.sqlite):
+
+Crie uma tabela chamada servicos com as seguintes colunas:
+
+id (TEXT, PRIMARY KEY)
+
+nome (TEXT, NOT NULL)
+
+duracao (INTEGER, NOT NULL)
+
+preco (REAL, NOT NULL)
+
+Endpoints da API:
+
+GET /api/servicos: Retorna a lista completa de todos os serviços ordenados por nome.
+
+POST /api/servicos: Recebe os dados de um novo serviço (nome, duracao, preco), gera um ID único, insere na tabela servicos e retorna o serviço recém-criado.
+
+PATCH /api/servicos/:id: Recebe o id de um serviço e os dados a serem atualizados. Atualiza o registro correspondente no banco de dados.
+
+DELETE /api/servicos/:id: Recebe o id de um serviço e o remove do banco de dados.
+
+3. Integração Frontend-Backend:
+
+A página de "Serviços" deve fazer uma chamada GET /api/servicos ao ser carregada para buscar a lista inicial.
+
+O formulário de "Novo Serviço" deve fazer uma chamada POST /api/servicos.
+
+O formulário de "Editar Serviço" deve fazer uma chamada PATCH /api/servicos/:id.
+
+O botão "Excluir", após a confirmação, deve fazer uma chamada DELETE /api/servicos/:id.
+
+Após cada operação de criação, edição ou exclusão, a lista de serviços no frontend deve ser atualizada automaticamente para refletir as mudanças.

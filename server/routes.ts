@@ -175,6 +175,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PATCH /api/servicos/:id - Update service
+  app.patch("/api/servicos/:id", (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertServicoSchema.partial().parse(req.body);
+      
+      const fields: string[] = [];
+      const values: any[] = [];
+      
+      if (data.nome !== undefined) {
+        fields.push("nome = ?");
+        values.push(data.nome);
+      }
+      if (data.descricao !== undefined) {
+        fields.push("descricao = ?");
+        values.push(data.descricao || null);
+      }
+      if (data.preco !== undefined) {
+        fields.push("preco = ?");
+        values.push(data.preco);
+      }
+      if (data.duracao !== undefined) {
+        fields.push("duracao = ?");
+        values.push(data.duracao);
+      }
+      
+      if (fields.length === 0) {
+        return res.status(400).json({ error: "No fields to update" });
+      }
+      
+      values.push(id);
+      
+      db.prepare(`UPDATE servicos SET ${fields.join(", ")} WHERE id = ?`).run(...values);
+      
+      const servico = db.prepare("SELECT * FROM servicos WHERE id = ?").get(id) as Servico;
+      if (!servico) {
+        return res.status(404).json({ error: "Servico not found" });
+      }
+      
+      res.json(servico);
+    } catch (error: any) {
+      console.error("Error updating servico:", error);
+      res.status(400).json({ error: error.message || "Failed to update servico" });
+    }
+  });
+
+  // DELETE /api/servicos/:id - Delete service
+  app.delete("/api/servicos/:id", (req, res) => {
+    try {
+      const { id } = req.params;
+      db.prepare("DELETE FROM servicos WHERE id = ?").run(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting servico:", error);
+      res.status(500).json({ error: "Failed to delete servico" });
+    }
+  });
+
   // ===== PRODUTOS ROUTES =====
   
   // GET /api/produtos - List all products
