@@ -48,30 +48,32 @@ export default function Agenda() {
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Header */}
-      <div className="p-4 border-b bg-card">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-heading font-semibold text-foreground">Agenda</h1>
+      <div className="p-3 sm:p-4 border-b bg-card">
+        <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+          <h1 className="text-xl sm:text-2xl font-heading font-semibold text-foreground">Agenda</h1>
           <Button
-            size="default"
+            size="sm"
             onClick={() => setDialogOpen(true)}
             data-testid="button-novo-agendamento"
+            className="sm:h-9"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Agendamento
+            <Plus className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Novo Agendamento</span>
           </Button>
         </div>
 
         {/* Week Navigation */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={previousWeek}
             data-testid="button-previous-week"
+            className="h-8 w-8"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4" />
           </Button>
-          <span className="text-sm font-medium text-foreground">
+          <span className="text-sm sm:text-base font-medium text-foreground capitalize">
             {format(weekStart, "MMMM yyyy", { locale: ptBR })}
           </span>
           <Button
@@ -79,13 +81,14 @@ export default function Agenda() {
             size="icon"
             onClick={nextWeek}
             data-testid="button-next-week"
+            className="h-8 w-8"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Week Days */}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {weekDays.map((day) => {
             const isSelected = isSameDay(day, selectedDate);
             const isToday = isSameDay(day, new Date());
@@ -98,24 +101,24 @@ export default function Agenda() {
                 key={day.toISOString()}
                 onClick={() => setSelectedDate(day)}
                 className={`
-                  p-3 rounded-md text-center transition-colors hover-elevate active-elevate-2
+                  p-1.5 sm:p-3 rounded-md text-center transition-colors hover-elevate active-elevate-2
                   ${isSelected ? "bg-primary text-primary-foreground" : "bg-card"}
-                  ${isToday && !isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""}
+                  ${isToday && !isSelected ? "ring-1 sm:ring-2 ring-primary ring-offset-1 sm:ring-offset-2 ring-offset-background" : ""}
                 `}
                 data-testid={`button-day-${format(day, "yyyy-MM-dd")}`}
               >
-                <div className="text-xs font-medium mb-1">
+                <div className="text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1">
                   {format(day, "EEE", { locale: ptBR })}
                 </div>
-                <div className="text-lg font-semibold mb-1">
+                <div className="text-base sm:text-lg font-semibold mb-0.5 sm:mb-1">
                   {format(day, "dd")}
                 </div>
                 {dayAgendamentos.length > 0 && (
-                  <div className="flex justify-center gap-1">
+                  <div className="flex justify-center gap-0.5 sm:gap-1">
                     {dayAgendamentos.slice(0, 3).map((_, i) => (
                       <div
                         key={i}
-                        className="w-1 h-1 rounded-full bg-current opacity-60"
+                        className="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-current opacity-60"
                       />
                     ))}
                   </div>
@@ -127,13 +130,13 @@ export default function Agenda() {
       </div>
 
       {/* Agendamentos do Dia */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="mb-4 flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold text-foreground">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+        <div className="mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
+          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">
             {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
           </h2>
-          <Badge variant="secondary" className="ml-2">
+          <Badge variant="secondary" className="text-[10px] sm:text-xs">
             {selectedDayAgendamentos.length} agendamento{selectedDayAgendamentos.length !== 1 ? "s" : ""}
           </Badge>
         </div>

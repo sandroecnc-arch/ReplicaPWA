@@ -27,16 +27,17 @@ export default function Clientes() {
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Header */}
-      <div className="p-4 border-b bg-card">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-heading font-semibold text-foreground">Clientes</h1>
+      <div className="p-3 sm:p-4 border-b bg-card">
+        <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+          <h1 className="text-xl sm:text-2xl font-heading font-semibold text-foreground">Clientes</h1>
           <Button
-            size="default"
+            size="sm"
             onClick={() => setDialogOpen(true)}
             data-testid="button-novo-cliente"
+            className="sm:h-9"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Cliente
+            <Plus className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Novo Cliente</span>
           </Button>
         </div>
 
@@ -55,7 +56,7 @@ export default function Clientes() {
       </div>
 
       {/* Lista de Clientes */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -90,27 +91,27 @@ export default function Clientes() {
             )}
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredClientes.map((cliente) => (
               <Card
                 key={cliente.id}
-                className="p-4 hover-elevate cursor-pointer transition-all"
+                className="p-3 sm:p-4 hover-elevate cursor-pointer transition-all"
                 onClick={() => setSelectedCliente(cliente)}
                 data-testid={`card-cliente-${cliente.id}`}
               >
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <User className="w-6 h-6 text-primary" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground truncate">
+                    <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">
                       {cliente.nome}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       {cliente.telefone}
                     </p>
                     {cliente.email && (
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                         {cliente.email}
                       </p>
                     )}
@@ -118,12 +119,12 @@ export default function Clientes() {
                 </div>
 
                 {/* Pontos de Fidelidade */}
-                <div className="flex items-center gap-2 pt-3 border-t border-card-border">
+                <div className="flex items-center gap-2 pt-2 sm:pt-3 border-t border-card-border">
                   <div className="flex items-center gap-1 text-primary">
-                    <Star className="w-4 h-4 fill-current" />
-                    <span className="text-sm font-semibold">{cliente.pontos}</span>
+                    <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
+                    <span className="text-xs sm:text-sm font-semibold">{cliente.pontos}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">pontos</span>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">pontos</span>
                   <Button
                     variant="outline"
                     size="sm"

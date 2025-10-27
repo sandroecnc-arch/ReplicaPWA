@@ -72,21 +72,22 @@ export default function Servicos() {
 
   return (
     <div className="h-full flex flex-col bg-background">
-      <div className="p-4 border-b bg-card">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-heading font-semibold text-foreground">Serviços</h1>
+      <div className="p-3 sm:p-4 border-b bg-card">
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-xl sm:text-2xl font-heading font-semibold text-foreground">Serviços</h1>
           <Button
-            size="default"
+            size="sm"
             onClick={handleNewServico}
             data-testid="button-novo-servico"
+            className="sm:h-9"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Serviço
+            <Plus className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Novo Serviço</span>
           </Button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -116,33 +117,33 @@ export default function Servicos() {
             </Button>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {servicos.map((servico) => (
               <Card
                 key={servico.id}
                 className="overflow-hidden"
                 data-testid={`card-servico-${servico.id}`}
               >
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg text-foreground mb-2" data-testid={`text-servico-nome-${servico.id}`}>
+                <CardContent className="p-3 sm:p-4">
+                  <h3 className="font-semibold text-base sm:text-lg text-foreground mb-2" data-testid={`text-servico-nome-${servico.id}`}>
                     {servico.nome}
                   </h3>
 
                   {servico.descricao && (
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2" data-testid={`text-servico-descricao-${servico.id}`}>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-3 line-clamp-2" data-testid={`text-servico-descricao-${servico.id}`}>
                       {servico.descricao}
                     </p>
                   )}
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
+                  <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
                       <span className="text-foreground" data-testid={`text-duracao-${servico.id}`}>
                         {servico.duracao} min
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <DollarSign className="w-4 h-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
+                      <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
                       <span className="text-foreground font-semibold" data-testid={`text-preco-${servico.id}`}>
                         {formatPrice(servico.preco)}
                       </span>
@@ -157,8 +158,8 @@ export default function Servicos() {
                       onClick={() => handleEdit(servico)}
                       data-testid={`button-editar-${servico.id}`}
                     >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Editar
+                      <Edit className="w-3.5 h-3.5 sm:mr-1" />
+                      <span className="hidden sm:inline">Editar</span>
                     </Button>
                     <Button
                       size="sm"
@@ -167,8 +168,8 @@ export default function Servicos() {
                       onClick={() => handleDelete(servico)}
                       data-testid={`button-excluir-${servico.id}`}
                     >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Excluir
+                      <Trash2 className="w-3.5 h-3.5 sm:mr-1" />
+                      <span className="hidden sm:inline">Excluir</span>
                     </Button>
                   </div>
                 </CardContent>

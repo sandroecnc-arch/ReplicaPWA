@@ -79,20 +79,21 @@ export default function Produtos() {
 
   return (
     <div className="h-full flex flex-col bg-background">
-      <div className="p-4 border-b bg-card">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-heading font-semibold text-foreground">Produtos</h1>
+      <div className="p-3 sm:p-4 border-b bg-card">
+        <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+          <h1 className="text-xl sm:text-2xl font-heading font-semibold text-foreground">Produtos</h1>
           <Button
-            size="default"
+            size="sm"
             onClick={handleNewProduto}
             data-testid="button-novo-produto"
+            className="sm:h-9"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Produto
+            <Plus className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Novo Produto</span>
           </Button>
         </div>
 
-        <div className="relative mb-4">
+        <div className="relative mb-3 sm:mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="search"
@@ -104,7 +105,7 @@ export default function Produtos() {
           />
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-1.5 sm:gap-2 flex-wrap">
           <Button
             size="sm"
             variant={selectedCategoria === null ? "default" : "outline"}
@@ -127,7 +128,7 @@ export default function Produtos() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -155,7 +156,7 @@ export default function Produtos() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredProdutos.map((produto) => {
               const needsRestock = produto.qty <= produto.minQty;
               
@@ -165,26 +166,26 @@ export default function Produtos() {
                   className="overflow-hidden"
                   data-testid={`card-produto-${produto.id}`}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div className="flex items-start gap-3 flex-1">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
+                      <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
                         {produto.colorHex && (
                           <div
-                            className="w-12 h-12 rounded-md border border-border flex-shrink-0"
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-md border border-border flex-shrink-0"
                             style={{ backgroundColor: produto.colorHex }}
                             data-testid={`color-preview-${produto.id}`}
                           />
                         )}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-foreground truncate" data-testid={`text-produto-nome-${produto.id}`}>
+                          <h3 className="font-semibold text-sm sm:text-base text-foreground truncate" data-testid={`text-produto-nome-${produto.id}`}>
                             {produto.nome}
                           </h3>
                           {produto.marca && (
-                            <p className="text-sm text-muted-foreground truncate" data-testid={`text-produto-marca-${produto.id}`}>
+                            <p className="text-xs sm:text-sm text-muted-foreground truncate" data-testid={`text-produto-marca-${produto.id}`}>
                               {produto.marca}
                             </p>
                           )}
-                          <Badge variant="outline" className="mt-1" data-testid={`badge-categoria-${produto.id}`}>
+                          <Badge variant="outline" className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs" data-testid={`badge-categoria-${produto.id}`}>
                             {produto.categoria}
                           </Badge>
                         </div>
@@ -192,24 +193,24 @@ export default function Produtos() {
                     </div>
 
                     {needsRestock && (
-                      <div className="flex items-center gap-2 p-2 rounded-md bg-destructive/10 border border-destructive/20 mb-3">
-                        <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
-                        <p className="text-xs font-medium text-destructive" data-testid={`alert-estoque-baixo-${produto.id}`}>
+                      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-md bg-destructive/10 border border-destructive/20 mb-2 sm:mb-3">
+                        <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-destructive flex-shrink-0" />
+                        <p className="text-[10px] sm:text-xs font-medium text-destructive" data-testid={`alert-estoque-baixo-${produto.id}`}>
                           Reposição necessária
                         </p>
                       </div>
                     )}
 
-                    <div className="space-y-2 mb-4">
+                    <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Estoque atual:</span>
-                        <span className={`text-sm font-semibold ${needsRestock ? 'text-destructive' : 'text-foreground'}`} data-testid={`text-qty-${produto.id}`}>
+                        <span className="text-xs sm:text-sm text-muted-foreground">Estoque atual:</span>
+                        <span className={`text-xs sm:text-sm font-semibold ${needsRestock ? 'text-destructive' : 'text-foreground'}`} data-testid={`text-qty-${produto.id}`}>
                           {produto.qty}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Estoque mínimo:</span>
-                        <span className="text-sm font-semibold text-foreground" data-testid={`text-min-qty-${produto.id}`}>
+                        <span className="text-xs sm:text-sm text-muted-foreground">Estoque mínimo:</span>
+                        <span className="text-xs sm:text-sm font-semibold text-foreground" data-testid={`text-min-qty-${produto.id}`}>
                           {produto.minQty}
                         </span>
                       </div>
@@ -223,8 +224,8 @@ export default function Produtos() {
                         onClick={() => handleEdit(produto)}
                         data-testid={`button-editar-${produto.id}`}
                       >
-                        <Edit className="w-4 h-4 mr-1" />
-                        Editar
+                        <Edit className="w-3.5 h-3.5 sm:mr-1" />
+                        <span className="hidden sm:inline">Editar</span>
                       </Button>
                       <Button
                         size="sm"
@@ -233,8 +234,8 @@ export default function Produtos() {
                         onClick={() => handleDelete(produto)}
                         data-testid={`button-excluir-${produto.id}`}
                       >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Excluir
+                        <Trash2 className="w-3.5 h-3.5 sm:mr-1" />
+                        <span className="hidden sm:inline">Excluir</span>
                       </Button>
                     </div>
                   </CardContent>

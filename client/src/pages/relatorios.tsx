@@ -77,13 +77,13 @@ export default function Relatorios() {
 
   return (
     <div className="h-full overflow-y-auto bg-background">
-      <div className="p-4">
-        <h1 className="text-2xl font-heading font-semibold text-foreground mb-6">
+      <div className="p-3 sm:p-4">
+        <h1 className="text-xl sm:text-2xl font-heading font-semibold text-foreground mb-4 sm:mb-6">
           Relatórios
         </h1>
 
         {/* Cards de Estatísticas */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
           {isLoading ? (
             <>
               {[1, 2, 3, 4].map((i) => (
@@ -102,70 +102,70 @@ export default function Relatorios() {
           ) : (
             <>
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardHeader className="flex flex-row items-center justify-between gap-1 sm:gap-2 space-y-0 pb-1.5 sm:pb-2 p-3 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground leading-tight">
                     Faturamento Total
                   </CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">
+                <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold text-foreground">
                     R$ {faturamentoTotal.toFixed(2)}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {agendamentosConcluidos} serviços concluídos
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+                    {agendamentosConcluidos} serviços
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Total de Clientes
+                <CardHeader className="flex flex-row items-center justify-between gap-1 sm:gap-2 space-y-0 pb-1.5 sm:pb-2 p-3 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground leading-tight">
+                    Clientes
                   </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">
+                <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold text-foreground">
                     {totalClientes}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Clientes cadastrados
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+                    Cadastrados
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardHeader className="flex flex-row items-center justify-between gap-1 sm:gap-2 space-y-0 pb-1.5 sm:pb-2 p-3 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground leading-tight">
                     Agendamentos
                   </CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">
+                <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold text-foreground">
                     {totalAgendamentos}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Total de agendamentos
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+                    Total
                   </p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Taxa de Conclusão
+                <CardHeader className="flex flex-row items-center justify-between gap-1 sm:gap-2 space-y-0 pb-1.5 sm:pb-2 p-3 sm:p-6">
+                  <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground leading-tight">
+                    Conclusão
                   </CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                  <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">
+                <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                  <div className="text-lg sm:text-2xl font-bold text-foreground">
                     {totalAgendamentos > 0
                       ? Math.round((agendamentosConcluidos / totalAgendamentos) * 100)
                       : 0}%
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
                     {agendamentosConcluidos} de {totalAgendamentos}
                   </p>
                 </CardContent>
@@ -175,7 +175,7 @@ export default function Relatorios() {
         </div>
 
         {/* Gráficos */}
-        <div className="grid gap-6 md:grid-cols-2 mb-6">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 mb-4 sm:mb-6">
           {/* Serviços Mais Populares */}
           <Card>
             <CardHeader>
