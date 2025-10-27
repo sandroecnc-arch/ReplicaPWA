@@ -106,9 +106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const data = insertClienteSchema.parse(req.body);
       const result = db.prepare(`
-        INSERT INTO clientes (nome, telefone, email, instagram, pontos)
-        VALUES (?, ?, ?, ?, 0)
-      `).run(data.nome, data.telefone, data.email || null, data.instagram || null);
+        INSERT INTO clientes (nome, telefone, email, instagram, pontos, alergias, preferencias)
+        VALUES (?, ?, ?, ?, 0, ?, ?)
+      `).run(data.nome, data.telefone, data.email || null, data.instagram || null, data.alergias || null, data.preferencias || null);
 
       const cliente = db.prepare("SELECT * FROM clientes WHERE id = ?").get(result.lastInsertRowid) as Cliente;
       res.status(201).json(cliente);
@@ -124,9 +124,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = insertClienteSchema.parse(req.body);
       db.prepare(`
         UPDATE clientes
-        SET nome = ?, telefone = ?, email = ?, instagram = ?
+        SET nome = ?, telefone = ?, email = ?, instagram = ?, alergias = ?, preferencias = ?
         WHERE id = ?
-      `).run(data.nome, data.telefone, data.email || null, data.instagram || null, req.params.id);
+      `).run(data.nome, data.telefone, data.email || null, data.instagram || null, data.alergias || null, data.preferencias || null, req.params.id);
 
       const cliente = db.prepare("SELECT * FROM clientes WHERE id = ?").get(req.params.id) as Cliente;
       res.json(cliente);
