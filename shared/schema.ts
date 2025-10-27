@@ -8,6 +8,8 @@ export const clienteSchema = z.object({
   email: z.string().email().optional(),
   instagram: z.string().optional(),
   pontos: z.number().default(0),
+  alergias: z.string().optional(),
+  preferencias: z.string().optional(),
 });
 
 export const insertClienteSchema = clienteSchema.omit({ id: true, pontos: true }).extend({
@@ -15,6 +17,8 @@ export const insertClienteSchema = clienteSchema.omit({ id: true, pontos: true }
   telefone: z.string().trim().min(1, "Telefone é obrigatório"),
   email: z.string().email().optional().or(z.literal("")).transform(val => val === "" ? undefined : val),
   instagram: z.string().optional().transform(val => val === "" ? undefined : val),
+  alergias: z.string().optional().transform(val => val === "" ? undefined : val),
+  preferencias: z.string().optional().transform(val => val === "" ? undefined : val),
 });
 
 export type Cliente = z.infer<typeof clienteSchema>;
