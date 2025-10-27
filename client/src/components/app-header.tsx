@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Bell, Download, Moon, Sun } from "lucide-react";
+import { Bell, Download, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
+import { useAuth } from "@/contexts/auth-context";
 import { initializeOneSignal, requestNotificationPermission, getNotificationPermission } from "@/lib/onesignal";
 import { useToast } from "@/hooks/use-toast";
 
@@ -10,6 +11,7 @@ export function AppHeader() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>("default");
   const { theme, setTheme } = useTheme();
+  const { logout, user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -83,6 +85,12 @@ export function AppHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          {user && (
+            <span className="text-sm text-muted-foreground hidden sm:inline" data-testid="text-user-email">
+              {user.email}
+            </span>
+          )}
+
           {/* Botão de Tema */}
           <Button
             variant="ghost"
@@ -126,6 +134,17 @@ export function AppHeader() {
               <span className="hidden sm:inline">Instalar</span>
             </Button>
           )}
+
+          {/* Botão de Logout */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={logout}
+            data-testid="button-logout"
+          >
+            <LogOut className="h-5 w-5" />
+            <span className="sr-only">Sair</span>
+          </Button>
         </div>
       </div>
     </header>

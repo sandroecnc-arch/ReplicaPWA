@@ -4,9 +4,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/contexts/auth-context";
+import { ProtectedRoute } from "@/components/protected-route";
 import { AppHeader } from "@/components/app-header";
 import { BottomNavigation } from "@/components/bottom-navigation";
 
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 import Agenda from "@/pages/agenda";
 import Clientes from "@/pages/clientes";
 import Servicos from "@/pages/servicos";
@@ -15,7 +19,7 @@ import Relatorios from "@/pages/relatorios";
 import Configuracoes from "@/pages/configuracoes";
 import NotFound from "@/pages/not-found";
 
-function Router() {
+function ProtectedApp() {
   return (
     <div className="h-screen flex flex-col bg-background">
       <AppHeader />
@@ -35,14 +39,30 @@ function Router() {
   );
 }
 
+function Router() {
+  return (
+    <Switch>
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route>
+        <ProtectedRoute>
+          <ProtectedApp />
+        </ProtectedRoute>
+      </Route>
+    </Switch>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

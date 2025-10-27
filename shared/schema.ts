@@ -1,8 +1,30 @@
 import { z } from "zod";
 
+// Usuarios (Users) Schema
+export const usuarioSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  passwordHash: z.string(),
+});
+
+export const insertUsuarioSchema = z.object({
+  email: z.string().email().min(1, "Email é obrigatório"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+});
+
+export const loginSchema = z.object({
+  email: z.string().email().min(1, "Email é obrigatório"),
+  password: z.string().min(1, "Senha é obrigatória"),
+});
+
+export type Usuario = z.infer<typeof usuarioSchema>;
+export type InsertUsuario = z.infer<typeof insertUsuarioSchema>;
+export type LoginCredentials = z.infer<typeof loginSchema>;
+
 // Clientes (Clients) Schema
 export const clienteSchema = z.object({
   id: z.number(),
+  userId: z.number(),
   nome: z.string(),
   telefone: z.string(),
   email: z.string().email().optional(),
@@ -12,7 +34,7 @@ export const clienteSchema = z.object({
   preferencias: z.string().optional(),
 });
 
-export const insertClienteSchema = clienteSchema.omit({ id: true, pontos: true }).extend({
+export const insertClienteSchema = clienteSchema.omit({ id: true, pontos: true, userId: true }).extend({
   nome: z.string().trim().min(1, "Nome é obrigatório"),
   telefone: z.string().trim().min(1, "Telefone é obrigatório"),
   email: z.string().email().optional().or(z.literal("")).transform(val => val === "" ? undefined : val),
@@ -27,13 +49,14 @@ export type InsertCliente = z.infer<typeof insertClienteSchema>;
 // Servicos (Services) Schema
 export const servicoSchema = z.object({
   id: z.number(),
+  userId: z.number(),
   nome: z.string(),
   descricao: z.string().optional(),
   preco: z.number(),
   duracao: z.number(), // em minutos
 });
 
-export const insertServicoSchema = servicoSchema.omit({ id: true }).extend({
+export const insertServicoSchema = servicoSchema.omit({ id: true, userId: true }).extend({
   nome: z.string().trim().min(1, "Nome é obrigatório"),
   duracao: z.number().min(1, "Duração deve ser pelo menos 1 minuto"),
   preco: z.number().min(0, "Preço não pode ser negativo"),
@@ -45,6 +68,7 @@ export type InsertServico = z.infer<typeof insertServicoSchema>;
 // Produtos (Products) Schema
 export const produtoSchema = z.object({
   id: z.number(),
+  userId: z.number(),
   nome: z.string(),
   marca: z.string().optional(),
   categoria: z.string(),
@@ -53,7 +77,7 @@ export const produtoSchema = z.object({
   minQty: z.number(),
 });
 
-export const insertProdutoSchema = produtoSchema.omit({ id: true }).extend({
+export const insertProdutoSchema = produtoSchema.omit({ id: true, userId: true }).extend({
   qty: z.number().min(0).default(0),
   minQty: z.number().min(0).default(0),
 });
@@ -64,6 +88,7 @@ export type InsertProduto = z.infer<typeof insertProdutoSchema>;
 // Agendamentos (Appointments) Schema
 export const agendamentoSchema = z.object({
   id: z.number(),
+  userId: z.number(),
   clienteId: z.number(),
   servicoId: z.number(),
   dataHora: z.string(), // ISO datetime string
@@ -71,7 +96,7 @@ export const agendamentoSchema = z.object({
   observacoes: z.string().optional(),
 });
 
-export const insertAgendamentoSchema = agendamentoSchema.omit({ id: true }).extend({
+export const insertAgendamentoSchema = agendamentoSchema.omit({ id: true, userId: true }).extend({
   status: z.enum(["pending", "confirmed", "done", "cancelled"]).default("pending"),
 });
 
