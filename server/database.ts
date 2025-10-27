@@ -16,7 +16,9 @@ export function initializeDatabase() {
       telefone TEXT NOT NULL,
       email TEXT,
       instagram TEXT,
-      pontos INTEGER DEFAULT 0
+      pontos INTEGER DEFAULT 0,
+      alergias TEXT,
+      preferencias TEXT
     );
 
     CREATE TABLE IF NOT EXISTS servicos (
@@ -72,6 +74,24 @@ export function initializeDatabase() {
     for (const servico of servicos) {
       insertServico.run(...servico);
     }
+  }
+
+  // Add alergias and preferencias columns if they don't exist (migration)
+  try {
+    const tableInfo = db.pragma("table_info(clientes)") as Array<{ name: string }>;
+    const columnNames = tableInfo.map(col => col.name);
+    
+    if (!columnNames.includes("alergias")) {
+      db.exec("ALTER TABLE clientes ADD COLUMN alergias TEXT");
+      console.log("✅ Added 'alergias' column to clientes table");
+    }
+    
+    if (!columnNames.includes("preferencias")) {
+      db.exec("ALTER TABLE clientes ADD COLUMN preferencias TEXT");
+      console.log("✅ Added 'preferencias' column to clientes table");
+    }
+  } catch (error) {
+    console.error("Error during migration:", error);
   }
 
   console.log("✅ Database initialized successfully at:", dbPath);
