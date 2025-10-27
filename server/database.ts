@@ -65,30 +65,7 @@ export function initializeDatabase() {
     );
   `);
 
-  // Insert default services if the table is empty
-  const servicosCount = db.prepare("SELECT COUNT(*) as count FROM servicos").get() as { count: number };
-  
-  if (servicosCount.count === 0) {
-    const insertServico = db.prepare(`
-      INSERT INTO servicos (nome, descricao, preco, duracao)
-      VALUES (?, ?, ?, ?)
-    `);
-
-    const servicos = [
-      ["Manicure Simples", "Manicure básica com esmaltação", 35.0, 45],
-      ["Manicure com Francesinha", "Manicure com aplicação de francesinha", 45.0, 60],
-      ["Pedicure Simples", "Pedicure básica com esmaltação", 40.0, 50],
-      ["Pedicure Completa", "Pedicure com hidratação e massagem", 55.0, 75],
-      ["Alongamento de Unhas", "Alongamento com gel ou acrílico", 80.0, 120],
-      ["Blindagem", "Tratamento de blindagem para fortalecimento", 60.0, 60],
-      ["Esmaltação em Gel", "Aplicação de esmalte em gel", 50.0, 45],
-      ["Design de Unhas", "Decoração artística nas unhas", 70.0, 90],
-    ];
-
-    for (const servico of servicos) {
-      insertServico.run(...servico);
-    }
-  }
+  // No default seeding for services - each user creates their own
 
   // Add alergias and preferencias columns if they don't exist (migration)
   try {

@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
+if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
+  throw new Error("FATAL: JWT_SECRET environment variable must be set in production mode!");
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key-not-for-production";
 
 export interface AuthRequest extends Request {
   user?: {
