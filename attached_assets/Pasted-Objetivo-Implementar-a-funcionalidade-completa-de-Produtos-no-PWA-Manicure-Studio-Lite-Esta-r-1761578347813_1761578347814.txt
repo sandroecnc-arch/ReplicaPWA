@@ -1,0 +1,83 @@
+Objetivo: Implementar a funcionalidade completa de "Produtos" no PWA "Manicure Studio Lite". Esta área permitirá à usuária gerenciar seu estoque de produtos (como esmaltes, bases, etc.), com alertas visuais para itens que precisam de reposição.
+
+1. Interface do Usuário (Frontend - React):
+
+Página Principal da Aba "Produtos":
+
+No topo, adicione um botão de "+" para abrir o formulário de "Novo Produto".
+
+Abaixo, inclua uma barra de busca para filtrar produtos por nome ou marca.
+
+Implemente um sistema de filtros por "Categoria" (ex: Esmalte, Base, Top Coat) que aparecem como botões clicáveis.
+
+Liste os produtos em cards individuais.
+
+Card de Produto:
+
+Visualização: Se o produto tiver uma cor (colorHex), exiba uma amostra visual (um círculo ou quadrado colorido).
+
+Informações: Mostre o Nome, Marca, Categoria e a Quantidade atual em estoque.
+
+Alerta de Estoque Baixo: Se a Quantidade (qty) for menor ou igual à Quantidade Mínima (minQty), exiba um aviso visual proeminente no card (ex: um ícone de alerta e um texto "Reposição necessária").
+
+Ações: Inclua botões de "Editar" e "Excluir" em cada card.
+
+Formulário de Adicionar/Editar Produto (em um modal):
+
+O formulário deve conter os seguintes campos:
+
+Nome: (Texto, obrigatório) - Ex: "Vermelho Intenso"
+
+Marca: (Texto, opcional) - Ex: "Risqué"
+
+Categoria: (Texto, obrigatório) - Ex: "Esmalte"
+
+Cor (Hex): (Input de texto e um input type="color" para seleção visual, opcional) - Ex: "#FF0000"
+
+Quantidade em Estoque: (Número, obrigatório, min="0")
+
+Quantidade Mínima para Alerta: (Número, obrigatório, min="0")
+
+Deve ter os botões "Salvar" e "Cancelar". Ao salvar, a API correspondente deve ser chamada e a lista de produtos, atualizada.
+
+2. Lógica do Backend (Node.js / Express / SQLite):
+
+Tabela no Banco de Dados (db.sqlite):
+
+Crie uma tabela chamada produtos com as seguintes colunas:
+
+id (TEXT, PRIMARY KEY)
+
+name (TEXT, NOT NULL)
+
+marca (TEXT)
+
+categoria (TEXT, NOT NULL)
+
+colorHex (TEXT)
+
+qty (INTEGER, NOT NULL, DEFAULT 0)
+
+minQty (INTEGER, NOT NULL, DEFAULT 0)
+
+Endpoints da API:
+
+GET /api/produtos: Retorna a lista completa de todos os produtos do banco de dados.
+
+POST /api/produtos: Recebe os dados de um novo produto no corpo da requisição, gera um ID único, insere na tabela produtos e retorna o produto recém-criado.
+
+PATCH /api/produtos/:id: Recebe o id de um produto e os dados a serem atualizados. Atualiza o registro correspondente no banco de dados.
+
+DELETE /api/produtos/:id: Recebe o id de um produto e o remove do banco de dados.
+
+3. Integração Frontend-Backend:
+
+A página de produtos deve fazer uma chamada GET /api/produtos ao ser carregada para buscar a lista inicial.
+
+O formulário de "Novo Produto" deve fazer uma chamada POST /api/produtos.
+
+O formulário de "Editar Produto" deve fazer uma chamada PATCH /api/produtos/:id.
+
+O botão "Excluir" deve fazer uma chamada DELETE /api/produtos/:id.
+
+Após cada operação de criação, edição ou exclusão, a lista de produtos no frontend deve ser atualizada para refletir as mudanças.
