@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar, Clock, Plus, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +45,12 @@ export default function Agenda() {
 
   const previousWeek = () => setCurrentDate(addDays(currentDate, -7));
   const nextWeek = () => setCurrentDate(addDays(currentDate, 7));
+
+  const openWhatsApp = (telefone: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const cleanPhone = telefone.replace(/\D/g, '');
+    window.open(`https://wa.me/55${cleanPhone}`, '_blank');
+  };
 
   return (
     <div className="h-full flex flex-col bg-background">
@@ -188,9 +195,20 @@ export default function Agenda() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="font-semibold text-foreground">
-                          {agendamento.cliente.nome}
-                        </h3>
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <h3 className="font-semibold text-foreground truncate">
+                            {agendamento.cliente.nome}
+                          </h3>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 flex-shrink-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950"
+                            onClick={(e) => openWhatsApp(agendamento.cliente.telefone, e)}
+                            data-testid={`button-whatsapp-${agendamento.id}`}
+                          >
+                            <SiWhatsapp className="w-4 h-4" />
+                          </Button>
+                        </div>
                         <Badge className={statusColors[agendamento.status]}>
                           {statusLabels[agendamento.status]}
                         </Badge>
