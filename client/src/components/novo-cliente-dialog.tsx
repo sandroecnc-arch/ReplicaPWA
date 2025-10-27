@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Instagram } from "lucide-react";
 
 interface NovoClienteDialogProps {
   open: boolean;
@@ -36,6 +37,7 @@ export function NovoClienteDialog({ open, onOpenChange }: NovoClienteDialogProps
       nome: "",
       telefone: "",
       email: "",
+      instagram: "",
     },
   });
 
@@ -111,17 +113,20 @@ export function NovoClienteDialog({ open, onOpenChange }: NovoClienteDialogProps
 
             <FormField
               control={form.control}
-              name="email"
+              name="instagram"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-mail (opcional)</FormLabel>
+                  <FormLabel>Instagram (opcional)</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="cliente@exemplo.com"
-                      {...field}
-                      data-testid="input-email"
-                    />
+                    <div className="relative">
+                      <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="@usuario"
+                        {...field}
+                        className="pl-10"
+                        data-testid="input-instagram"
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -15,6 +15,7 @@ export function initializeDatabase() {
       nome TEXT NOT NULL,
       telefone TEXT NOT NULL,
       email TEXT,
+      instagram TEXT,
       pontos INTEGER DEFAULT 0
     );
 

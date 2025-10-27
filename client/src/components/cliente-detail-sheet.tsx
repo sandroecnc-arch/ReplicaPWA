@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { User, Star, Calendar, Phone, Mail, Edit, Trash2, X } from "lucide-react";
+import { User, Star, Calendar, Phone, Instagram, Edit, Trash2, X } from "lucide-react";
 import { insertClienteSchema, type InsertCliente, type Cliente, type AgendamentoComDetalhes } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,7 @@ export function ClienteDetailSheet({ cliente, open, onOpenChange }: ClienteDetai
       nome: cliente.nome,
       telefone: cliente.telefone,
       email: cliente.email || "",
+      instagram: cliente.instagram || "",
     },
   });
 
@@ -154,10 +155,10 @@ export function ClienteDetailSheet({ cliente, open, onOpenChange }: ClienteDetai
                     <Phone className="w-4 h-4" />
                     <span>{cliente.telefone}</span>
                   </div>
-                  {cliente.email && (
+                  {cliente.instagram && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Mail className="w-4 h-4" />
-                      <span>{cliente.email}</span>
+                      <Instagram className="w-4 h-4" />
+                      <span>{cliente.instagram}</span>
                     </div>
                   )}
                 </div>
@@ -269,9 +270,9 @@ export function ClienteDetailSheet({ cliente, open, onOpenChange }: ClienteDetai
                       <p className="mt-1 text-sm text-muted-foreground">{cliente.telefone}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground">E-mail</label>
+                      <label className="text-sm font-medium text-foreground">Instagram</label>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {cliente.email || "Não informado"}
+                        {cliente.instagram || "Não informado"}
                       </p>
                     </div>
 
@@ -329,12 +330,20 @@ export function ClienteDetailSheet({ cliente, open, onOpenChange }: ClienteDetai
 
                       <FormField
                         control={form.control}
-                        name="email"
+                        name="instagram"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>E-mail</FormLabel>
+                            <FormLabel>Instagram (opcional)</FormLabel>
                             <FormControl>
-                              <Input type="email" {...field} data-testid="input-email-edit" />
+                              <div className="relative">
+                                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                  placeholder="@usuario"
+                                  {...field}
+                                  className="pl-10"
+                                  data-testid="input-instagram-edit"
+                                />
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>

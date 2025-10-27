@@ -56,6 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           c.nome as 'cliente.nome',
           c.telefone as 'cliente.telefone',
           c.email as 'cliente.email',
+          c.instagram as 'cliente.instagram',
           c.pontos as 'cliente.pontos',
           s.id as 'servico.id',
           s.nome as 'servico.nome',
@@ -81,6 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           nome: row["cliente.nome"],
           telefone: row["cliente.telefone"],
           email: row["cliente.email"],
+          instagram: row["cliente.instagram"],
           pontos: row["cliente.pontos"],
         },
         servico: {
@@ -104,9 +106,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const data = insertClienteSchema.parse(req.body);
       const result = db.prepare(`
-        INSERT INTO clientes (nome, telefone, email, pontos)
-        VALUES (?, ?, ?, 0)
-      `).run(data.nome, data.telefone, data.email || null);
+        INSERT INTO clientes (nome, telefone, email, instagram, pontos)
+        VALUES (?, ?, ?, ?, 0)
+      `).run(data.nome, data.telefone, data.email || null, data.instagram || null);
 
       const cliente = db.prepare("SELECT * FROM clientes WHERE id = ?").get(result.lastInsertRowid) as Cliente;
       res.status(201).json(cliente);
@@ -122,9 +124,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = insertClienteSchema.parse(req.body);
       db.prepare(`
         UPDATE clientes
-        SET nome = ?, telefone = ?, email = ?
+        SET nome = ?, telefone = ?, email = ?, instagram = ?
         WHERE id = ?
-      `).run(data.nome, data.telefone, data.email || null, req.params.id);
+      `).run(data.nome, data.telefone, data.email || null, data.instagram || null, req.params.id);
 
       const cliente = db.prepare("SELECT * FROM clientes WHERE id = ?").get(req.params.id) as Cliente;
       res.json(cliente);
@@ -341,6 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           c.nome as 'cliente.nome',
           c.telefone as 'cliente.telefone',
           c.email as 'cliente.email',
+          c.instagram as 'cliente.instagram',
           c.pontos as 'cliente.pontos',
           s.id as 'servico.id',
           s.nome as 'servico.nome',
@@ -365,6 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           nome: row["cliente.nome"],
           telefone: row["cliente.telefone"],
           email: row["cliente.email"],
+          instagram: row["cliente.instagram"],
           pontos: row["cliente.pontos"],
         },
         servico: {

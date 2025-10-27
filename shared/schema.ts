@@ -6,10 +6,14 @@ export const clienteSchema = z.object({
   nome: z.string(),
   telefone: z.string(),
   email: z.string().email().optional(),
+  instagram: z.string().optional(),
   pontos: z.number().default(0),
 });
 
-export const insertClienteSchema = clienteSchema.omit({ id: true, pontos: true });
+export const insertClienteSchema = clienteSchema.omit({ id: true, pontos: true }).extend({
+  nome: z.string().trim().min(1, "Nome é obrigatório"),
+  telefone: z.string().trim().min(1, "Telefone é obrigatório"),
+});
 
 export type Cliente = z.infer<typeof clienteSchema>;
 export type InsertCliente = z.infer<typeof insertClienteSchema>;
