@@ -1,6 +1,21 @@
 importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
+});
+
+const CACHE_NAME = 'manicure-studio-v1';
+const RUNTIME_CACHE = 'manicure-studio-runtime-v1';
+
+const STATIC_ASSETS = ['/', '/index.html', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('SW: Caching static assets');
+      return cache.addAll(STATIC_ASSETS);
+    }).then(() => self.skipWaiting())
+  );
 });
 
 const CACHE_NAME = 'manicure-studio-v1';
