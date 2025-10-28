@@ -1,0 +1,61 @@
+Objetivo: Analisar, corrigir e empacotar o projeto PWA "Manicure Studio Lite" para um deploy limpo e funcional na Hostinger. O build atual está resultando em um manifest.json corrompido ou ausente e outros problemas de PWA.
+
+Por favor, siga estes 4 passos exatamente:
+
+Passo 1: Verificar e Corrigir os Arquivos do PWA
+
+Corrija o manifest.json:
+
+Verifique o arquivo public/manifest.json (ou client/public/manifest.json).
+
+Garanta que ele é um JSON válido e não está vazio. Se necessário, substitua seu conteúdo pelo código abaixo:
+
+JSON
+
+{
+  "name": "Manicure Studio Lite",
+  "short_name": "MSL",
+  "description": "Seu estúdio no bolso - Gerencie agendamentos, clientes, produtos e serviços",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7E6EC",
+  "theme_color": "#C2185B",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
+Verifique a Pasta de Ícones:
+
+Confirme que a pasta public/icons (ou client/public/icons) existe e contém os arquivos icon-192.png e icon-512.png.
+
+Corrija a Meta Tag Obsoleta:
+
+No arquivo index.html do seu frontend, encontre a linha <meta name="apple-mobile-web-app-capable" content="yes"> e substitua-a pela tag correta: <meta name="mobile-web-app-capable" content="yes">.
+
+Passo 2: Verificar a Configuração de Build
+
+Analise o arquivo vite.config.js. Certifique-se de que a configuração de build (build.outDir) está correta e que todos os arquivos da pasta public (como manifest.json, sw.js e a pasta icons) estão sendo copiados corretamente para a pasta de destino final.
+
+Passo 3: Fazer um Build Limpo
+
+Execute o comando npm install para garantir que todas as dependências estão corretas.
+
+Execute o comando npm run build para gerar a pasta dist com a versão de produção.
+
+Passo 4: Empacotar Apenas os Arquivos de Deploy
+
+Crie um novo arquivo ZIP chamado deploy_final.zip.
+
+IMPORTANTE: Adicione a este ZIP apenas o conteúdo da pasta dist/public/. A estrutura dentro do ZIP deve ser:
+
+/
+├── assets/
+├── icons/
+├── index.html
+├── manifest.json
+└── sw.js
+O ZIP não deve conter as pastas src, server, dist, node_modules, etc. Apenas o resultado final do build do frontend.
+
+Resultado Final: Ao final, me forneça o link para baixar o arquivo deploy_final.zip.
