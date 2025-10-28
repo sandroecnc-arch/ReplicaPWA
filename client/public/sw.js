@@ -1,4 +1,8 @@
 importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
 const CACHE_NAME = 'manicure-studio-v1';
 const RUNTIME_CACHE = 'manicure-studio-runtime-v1';
 
