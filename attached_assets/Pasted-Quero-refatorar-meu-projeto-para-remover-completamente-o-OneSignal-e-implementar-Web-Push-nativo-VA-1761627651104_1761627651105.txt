@@ -1,0 +1,370 @@
+Quero refatorar meu projeto para remover completamente o OneSignal e implementar Web Push nativo (VAPID) usando Node.js/Express no servidor e Service Worker no cliente.
+Siga à risca as instruções abaixo e gere os arquivos com o conteúdo indicado.
+
+Objetivo
+
+PWA funcionando (cache, offline) sem OneSignal.
+
+Web Push nativo com VAPID:
+
+Gerar/usar chaves VAPID.
+
+Endpoints para: obter chave pública, salvar inscrição, enviar teste.
+
+Persistir inscrições (SQLite ou arquivo JSON simples).
+
+Exemplo de envio de notificação via servidor.
+
+Regras gerais
+
+Remover todo código/arquivo relacionado a OneSignal:
+
+remover <script src="https://cdn.onesignal.com/..."> do index.html
+
+deletar OneSignalSDKWorker.js e OneSignalSDKUpdaterWorker.js
+
+remover qualquer import/uso de OneSignal no client
+
+Manter o sw.js como service worker do PWA (com cache estático + runtime).
+
+Node mínimo: >=20 no package.json ("engines").
+
+Usar Express e a lib web-push no backend.
+
+Criar variáveis de ambiente:
+
+VAPID_PUBLIC_KEY
+
+VAPID_PRIVATE_KEY
+
+VAPID_SUBJECT (ex.: mailto:meuemail@dominio.com)
+
+Se não existirem, gerar as chaves VAPID (um script npm run gen:vapid).
+
+CORS liberado para o próprio domínio (padrão: mesmo host).
+
+Estrutura sugerida
+/client
+  /public
+    index.html
+    manifest.json
+    icons/...
+    sw.js
+  src/
+    main.js
+    push.js       # lógica de inscrição
+/server
+  index.js        # app Express
+  push.js         # helpers de envio
+  db.js           # persistência simples (sqlite ou json)
+package.json
+
+1) package.json (raiz)
+
+scripts:
+
+"start": "node server/index.js"
+
+"dev": "nodemon server/index.js"
+
+"gen:vapid": "node server/push.js --gen"
+
+deps: express, cors, web-push, (opcional) better-sqlite3 ou usar JSON plano.
+
+engines: "node": ">=20 <21"
+
+2) Service Worker – client/public/sw.js
+
+Ajuste o cache name pro seu app; mantenha offline e suporte ao push.
+Crie/atualize com:
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+const CACHE_NAME = 'manicure-studio-v1';
+const STATIC_ASSETS = ['/', '/index.html', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
+  event.respondWith(
+    caches.match(request).then((cached) =>
+      cached ||
+      fetch(request).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        return res;
+      }).catch(() => caches.match('/index.html'))
+    )
+  );
+});
+
+// ======= PUSH =======
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (_) {}
+
+  const title = data.title || 'Nova notificação';
+  const options = {
+    body: data.body || '',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    data: { url: data.url || '/' }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification?.data?.url || '/';
+  event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientsArr) => {
+    const had = clientsArr.find((c) => c.url.includes(new URL(url, self.location.origin).pathname));
+    if (had) { had.focus(); return; }
+    return clients.openWindow(url);
+  }));
+});
+
+3) HTML – client/public/index.html
+
+Remover OneSignal.
+
+Registrar o SW e carregar o client.
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>Manicure Studio Lite</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(console.error);
+      });
+    }
+  </script>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+
+4) Client – client/src/main.js
+
+Chamar uma função para pedir permissão e assinar push.
+
+import { ensurePushSubscription } from './push.js';
+
+(async () => {
+  // sua inicialização da UI/app aqui...
+  try {
+    await ensurePushSubscription();
+    console.log('Push: inscrito/ok');
+  } catch (e) {
+    console.warn('Push: usuário negou ou erro:', e.message);
+  }
+})();
+
+5) Client – client/src/push.js
+
+Buscar chave pública do servidor.
+
+Criar/atualizar inscrição e enviar ao backend.
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  const output = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; ++i) output[i] = raw.charCodeAt(i);
+  return output;
+}
+
+export async function ensurePushSubscription() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    throw new Error('Push não suportado');
+  }
+
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') throw new Error('Permissão negada');
+
+  const reg = await navigator.serviceWorker.ready;
+  // obter a VAPID PUBLIC KEY do servidor
+  const vapidRes = await fetch('/api/vapid-public-key');
+  const { publicKey } = await vapidRes.json();
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(publicKey),
+  });
+
+  await fetch('/api/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(sub),
+  });
+}
+
+6) Backend – server/index.js
+
+Express + rotas de push.
+
+import express from 'express';
+import cors from 'cors';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { getPublicKey, saveSubscription, sendToAll, loadAll } from './push.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// static (ajuste o caminho do seu build)
+app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
+
+// APIs de push
+app.get('/api/vapid-public-key', (req, res) => {
+  res.json({ publicKey: getPublicKey() });
+});
+
+app.post('/api/subscribe', async (req, res) => {
+  try {
+    await saveSubscription(req.body);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(400).json({ ok: false, error: e.message });
+  }
+});
+
+// endpoint de teste (envia para todos)
+app.post('/api/send-test', async (req, res) => {
+  const { title = 'Teste', body = 'Olá!', url = '/' } = req.body || {};
+  try {
+    const result = await sendToAll({ title, body, url });
+    res.json({ ok: true, result });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log('Server on :', PORT));
+
+7) Backend – server/push.js
+
+Geração de chaves VAPID e envio de notificações.
+
+import fs from 'node:fs';
+import path from 'node:path';
+import webpush from 'web-push';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const VAPID_FILE = path.join(__dirname, 'vapid.json');
+const SUBS_FILE = path.join(__dirname, 'subs.json'); // simples; troque por DB se quiser
+
+function ensureVapid() {
+  let vapid;
+  if (fs.existsSync(VAPID_FILE)) {
+    vapid = JSON.parse(fs.readFileSync(VAPID_FILE, 'utf-8'));
+  } else {
+    const keys = webpush.generateVAPIDKeys();
+    vapid = { publicKey: keys.publicKey, privateKey: keys.privateKey, subject: process.env.VAPID_SUBJECT || 'mailto:you@example.com' };
+    fs.writeFileSync(VAPID_FILE, JSON.stringify(vapid, null, 2));
+  }
+  webpush.setVapidDetails(vapid.subject, process.env.VAPID_PUBLIC_KEY || vapid.publicKey, process.env.VAPID_PRIVATE_KEY || vapid.privateKey);
+  return vapid;
+}
+
+export function getPublicKey() {
+  const vapid = ensureVapid();
+  return process.env.VAPID_PUBLIC_KEY || vapid.publicKey;
+}
+
+export async function saveSubscription(sub) {
+  const list = loadAll();
+  const key = sub?.endpoint;
+  if (!key) throw new Error('sub inválida');
+  if (!list.find((s) => s.endpoint === key)) {
+    list.push(sub);
+    fs.writeFileSync(SUBS_FILE, JSON.stringify(list, null, 2));
+  }
+}
+
+export function loadAll() {
+  if (!fs.existsSync(SUBS_FILE)) return [];
+  return JSON.parse(fs.readFileSync(SUBS_FILE, 'utf-8'));
+}
+
+export async function sendToAll({ title, body, url }) {
+  ensureVapid();
+  const subs = loadAll();
+  const payload = JSON.stringify({ title, body, url });
+  const results = [];
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(sub, payload);
+      results.push({ endpoint: sub.endpoint, ok: true });
+    } catch (e) {
+      results.push({ endpoint: sub.endpoint, ok: false, error: e.message });
+    }
+  }
+  return results;
+}
+
+// CLI: gerar chaves
+if (process.argv.includes('--gen')) {
+  const keys = webpush.generateVAPIDKeys();
+  console.log('VAPID_PUBLIC_KEY=', keys.publicKey);
+  console.log('VAPID_PRIVATE_KEY=', keys.privateKey);
+  fs.writeFileSync(VAPID_FILE, JSON.stringify({ publicKey: keys.publicKey, privateKey: keys.privateKey, subject: process.env.VAPID_SUBJECT || 'mailto:you@example.com' }, null, 2));
+}
+
+8) Nginx (se aplicável)
+
+Certifique-se de não redirecionar /sw.js, /manifest.json, /api/* para index.html:
+
+location = /sw.js { try_files $uri =404; }
+location = /manifest.json { try_files $uri =404; }
+
+location /api/ {
+  proxy_pass http://127.0.0.1:3000;
+}
+
+location / {
+  try_files $uri $uri/ /index.html;
+}
+
+9) Como testar
+
+Build/start do servidor.
+
+Abra o site em HTTPS (obrigatório para push).
+
+Permita notificações quando solicitado.
+
+Envie um teste:
+
+curl -X POST https://SEU_DOMINIO/api/send-test \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Olá","body":"Teste Web Push","url":"/"}'
+
+Observações importantes
+
+iOS Safari só mostra push para PWA instalado (Add to Home Screen) e iOS recente.
+
+Sempre usar HTTPS e service worker na raiz.
+
+Para produção, troque subs.json por um DB (ex.: SQLite/Postgres).
+
+— FIM DO PROMPT —
