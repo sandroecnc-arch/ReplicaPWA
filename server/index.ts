@@ -2,14 +2,12 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./database";
-import { initializeOneSignal } from "./onesignal-service";
 import { startCronJobs } from "./cron-jobs";
 
 const app = express();
 
 // Initialize database and services
 initializeDatabase();
-initializeOneSignal();
 startCronJobs();
 
 declare module 'http' {

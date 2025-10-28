@@ -15,15 +15,39 @@ import {
   type Usuario,
   type AgendamentoComDetalhes,
 } from "@shared/schema";
-import {
-  addAppointmentTag,
-  removeAppointmentTag,
-  sendInactiveClientNotification,
-} from "./onesignal-service";
+import { getPublicKey, saveSubscription, sendToAll } from "./push";
 import { authMiddleware, generateToken, type AuthRequest } from "./auth-middleware";
 import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // ===== WEB PUSH ROUTES =====
+  
+  // GET /api/vapid-public-key - Get VAPID public key for push subscription
+  app.get("/api/vapid-public-key", (req, res) => {
+    res.json({ publicKey: getPublicKey() });
+  });
+
+  // POST /api/subscribe - Save push subscription
+  app.post("/api/subscribe", async (req, res) => {
+    try {
+      await saveSubscription(req.body);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(400).json({ ok: false, error: e.message });
+    }
+  });
+
+  // POST /api/send-test - Send test notification to all subscribers (authenticated)
+  app.post("/api/send-test", authMiddleware, async (req: AuthRequest, res) => {
+    const { title = "Teste", body = "Olá!", url = "/" } = req.body || {};
+    try {
+      const result = await sendToAll({ title, body, url });
+      res.json({ ok: true, result });
+    } catch (e: any) {
+      res.status(500).json({ ok: false, error: e.message });
+    }
+  });
+
   // ===== AUTH ROUTES =====
   
   // POST /api/auth/register - Register new user
@@ -524,9 +548,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data.observacoes || null
       );
 
-      // Add OneSignal tag for appointment reminder
-      await addAppointmentTag(Number(result.lastInsertRowid), data.dataHora);
-
       const agendamento = db.prepare("SELECT * FROM agendamentos WHERE id = ?").get(result.lastInsertRowid) as Agendamento;
       res.status(201).json(agendamento);
     } catch (error: any) {
@@ -569,13 +590,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`✅ Awarded 10 loyalty points to client ${data.clienteId}`);
       }
 
-      // Update OneSignal tags
-      if (data.status === "done" || data.status === "cancelled") {
-        await removeAppointmentTag(id);
-      } else {
-        await addAppointmentTag(id, data.dataHora);
-      }
-
       const agendamento = db.prepare("SELECT * FROM agendamentos WHERE id = ?").get(id) as Agendamento;
       res.json(agendamento);
     } catch (error: any) {
@@ -593,7 +607,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Agendamento not found" });
       }
 
-      await removeAppointmentTag(id);
       db.prepare("DELETE FROM agendamentos WHERE id = ? AND userId = ?").run(id, req.user!.id);
       res.status(204).send();
     } catch (error) {

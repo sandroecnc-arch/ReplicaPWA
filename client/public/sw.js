@@ -1,21 +1,5 @@
-importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
-
 self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
-});
-
-const CACHE_NAME = 'manicure-studio-v1';
-const RUNTIME_CACHE = 'manicure-studio-runtime-v1';
-
-const STATIC_ASSETS = ['/', '/index.html', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('SW: Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
-    }).then(() => self.skipWaiting())
-  );
 });
 
 const CACHE_NAME = 'manicure-studio-v1';
@@ -121,5 +105,43 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => caches.match(request))
+  );
+});
+
+// ======= NATIVE WEB PUSH =======
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (_) {}
+
+  const title = data.title || 'Nova notificação';
+  const options = {
+    body: data.body || '',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    data: { url: data.url || '/' }
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification?.data?.url || '/';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientsArr) => {
+        const targetUrl = new URL(url, self.location.origin);
+        const had = clientsArr.find((c) => c.url.includes(targetUrl.pathname));
+        if (had) {
+          had.focus();
+          return;
+        }
+        return clients.openWindow(url);
+      })
   );
 });

@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { db } from "./database";
-import { sendInactiveClientNotification } from "./onesignal-service";
+import { sendInactiveClientNotification } from "./push";
 import type { Cliente } from "@shared/schema";
 
 export function startCronJobs() {

@@ -3,7 +3,7 @@ import { Bell, Download, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/contexts/auth-context";
-import { requestNotificationPermission, getNotificationPermission } from "@/lib/onesignal";
+import { requestNotificationPermission, getNotificationPermission } from "@/push";
 import { useToast } from "@/hooks/use-toast";
 
 export function AppHeader() {
@@ -28,7 +28,7 @@ export function AppHeader() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Verificar permissão de notificação (OneSignal é inicializado via index.html)
+    // Verificar permissão de notificação
     setNotificationPermission(getNotificationPermission());
 
     return () => {
