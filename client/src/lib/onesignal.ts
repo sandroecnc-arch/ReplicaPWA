@@ -5,42 +5,6 @@ declare global {
   }
 }
 
-let isInitialized = false;
-
-export async function initializeOneSignal() {
-  if (isInitialized) return;
-
-  const appId = import.meta.env.VITE_ONESIGNAL_APP_ID;
-
-  if (!appId) {
-    console.warn('OneSignal App ID não configurado. Configure VITE_ONESIGNAL_APP_ID para habilitar notificações.');
-    return;
-  }
-
-  return new Promise<void>((resolve) => {
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async function (OneSignal: any) {
-      try {
-        await OneSignal.init({
-          appId: appId,
-          allowLocalhostAsSecureOrigin: true,
-          serviceWorkerParam: { scope: '/push/onesignal/' },
-          serviceWorkerPath: 'push/onesignal/OneSignalSDKWorker.js',
-          notifyButton: {
-            enable: false,
-          },
-        });
-        isInitialized = true;
-        console.log('✅ OneSignal initialized successfully');
-        resolve();
-      } catch (error) {
-        console.error('❌ Error initializing OneSignal:', error);
-        resolve();
-      }
-    });
-  });
-}
-
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!window.OneSignal) {
     console.error('OneSignal not loaded');
@@ -61,4 +25,22 @@ export function getNotificationPermission(): NotificationPermission {
     return Notification.permission;
   }
   return 'default';
+}
+
+export async function getOneSignalUserId(): Promise<string | null> {
+  if (!window.OneSignal) {
+    return null;
+  }
+
+  try {
+    const userId = await window.OneSignal.User.PushSubscription.id;
+    return userId;
+  } catch (error) {
+    console.error('Error getting OneSignal user ID:', error);
+    return null;
+  }
+}
+
+export function isOneSignalInitialized(): boolean {
+  return !!window.OneSignal;
 }
